@@ -59,12 +59,14 @@ export class E2EEncryption {
         this.conference.on(
             JitsiConferenceEvents.PARTICIPANT_PROPERTY_CHANGED,
             this._onParticipantPropertyChanged.bind(this));
-        this.conference.on(
-            JitsiConferenceEvents.USER_JOINED,
-            this._onParticipantJoined.bind(this));
-        this.conference.on(
-            JitsiConferenceEvents.USER_LEFT,
-            this._onParticipantLeft.bind(this));
+
+        // #TODO: Freddy disabled ratcheting/rotating, we need to look if we need to do this later
+        // this.conference.on(
+        //     JitsiConferenceEvents.USER_JOINED,
+        //     this._onParticipantJoined.bind(this));
+        // this.conference.on(
+        //     JitsiConferenceEvents.USER_LEFT,
+        //     this._onParticipantLeft.bind(this));
 
         // Conference media events in order to attach the encryptor / decryptor.
         // FIXME add events to TraceablePeerConnection which will allow to see when there's new receiver or sender
@@ -103,9 +105,17 @@ export class E2EEncryption {
      * @returns {boolean}
      */
     static isSupported(config) {
-        return browser.supportsInsertableStreams()
-            && OlmAdapter.isSupported()
-            && !(config.testing && config.testing.disableE2EE);
+        console.log(config);
+        console.log('config');
+        console.debug(`browser.supportsInsertableStreams(): ${browser.supportsInsertableStreams()}`);
+        console.debug(`OlmAdapter.isSupported(): ${OlmAdapter.isSupported()}`);
+        console.debug(`!(config.testing && config.testing.disableE2EE): ${!(config.testing && config.testing.disableE2EE)}`);
+
+        const supportsInsertable = browser.supportsInsertableStreams();
+        const olmSupported = OlmAdapter.isSupported();
+        const testing = !(config.testing && config.testing.disableE2EE);
+
+        return supportsInsertable && olmSupported && testing;
     }
 
     /**
@@ -121,26 +131,30 @@ export class E2EEncryption {
      * Enables / disables End-To-End encryption.
      *
      * @param {boolean} enabled - whether E2EE should be enabled or not.
-     * @returns {void}
+     * @param {Uint8Array|boolean} _key - The new key.
+     * @returns {Promise<boolean>}
      */
-    async setEnabled(enabled) {
+    async setEnabled(enabled, _key) {
+        console.debug(`SetEnabled enabled: ${enabled}`);
+        console.debug(`SetEnabled _key: ${_key}`);
+        console.debug(`SetEnabled this._enabled: ${this._enabled}`);
+        console.debug(`SetEnabled this._initialized: ${this._initialized}`);
         if (enabled === this._enabled) {
             return;
         }
-
         this._enabled = enabled;
 
         if (!this._initialized && enabled) {
-            // Generate a frame signing key pair. Per session currently.
-            this._signatureKeyPair = await crypto.subtle.generateKey(SIGNATURE_OPTIONS,
-                true, [ 'sign', 'verify' ]);
-            this._e2eeCtx.setSignatureKey(this.conference.myUserId(), this._signatureKeyPair.privateKey);
+            // // Generate a frame signing key pair. Per session currently.
+            // this._signatureKeyPair = await crypto.subtle.generateKey(SIGNATURE_OPTIONS,
+            //     true, [ 'sign', 'verify' ]);
+            // this._e2eeCtx.setSignatureKey(this.conference.myUserId(), this._signatureKeyPair.privateKey);
 
-            // Serialize the JWK of the signing key. Using JSON, might be easy to xml-ify.
-            const serializedSigningKey = await crypto.subtle.exportKey('jwk', this._signatureKeyPair.publicKey);
+            // // Serialize the JWK of the signing key. Using JSON, might be easy to xml-ify.
+            // const serializedSigningKey = await crypto.subtle.exportKey('jwk', this._signatureKeyPair.publicKey);
 
-            // TODO: sign this with the OLM account key.
-            this.conference.setLocalParticipantProperty('e2ee.signatureKey', JSON.stringify(serializedSigningKey));
+            // // TODO: sign this with the OLM account key.
+            // this.conference.setLocalParticipantProperty('e2ee.signatureKey', JSON.stringify(serializedSigningKey));
 
             // Need to re-create the peerconnections in order to apply the insertable streams constraint.
             // TODO: this was necessary due to some audio issues when indertable streams are used
@@ -150,15 +164,33 @@ export class E2EEncryption {
 
             this._initialized = true;
         }
+        console.debug(`SetEnabled this._initialized: ${this._initialized}`);
 
         // Generate a random key in case we are enabling.
-        this._key = enabled ? this._generateKey() : false;
+        this._key = enabled ? _key : false;
+        console.debug(`SetEnabled this._key: ${this._key}`);
+
+        const index = 0;
 
         // Send it to others using the E2EE olm channel.
-        this._olmAdapter.updateKey(this._key).then(index => {
-            // Set our key so we begin encrypting.
-            this._e2eeCtx.setKey(this.conference.myUserId(), this._key, index);
-        });
+        // if (enabled === true) {
+        //     index = await this._olmAdapter.updateKey(this._key, false);
+        // } else {
+        //     index = await this._olmAdapter.updateCurrentKey(this._key);
+        // }
+
+        console.debug(`SetEnabled index: ${index}`);
+
+        // Set our key so we begin encrypting.
+        this._e2eeCtx.setKey(this.conference.myUserId(), this._key, index);
+
+        for (const participant of this.conference.getParticipants()) {
+            const pId = participant.getId();
+
+            this._e2eeCtx.setKey(pId, this._key, index);
+        }
+
+        return enabled;
     }
 
     /**
@@ -264,6 +296,10 @@ export class E2EEncryption {
      * @private
      */
     async _onParticipantPropertyChanged(participant, name, oldValue, newValue) {
+        console.debug(`_onParticipantPropertyChanged: participant: ${participant}`);
+        console.debug(`_onParticipantPropertyChanged: name: ${name}`);
+        console.debug(`_onParticipantPropertyChanged: oldValue: ${oldValue}`);
+        console.debug(`_onParticipantPropertyChanged: newValue: ${newValue}`);
         switch (name) {
         case 'e2ee.idKey':
             logger.debug(`Participant ${participant.getId()} updated their id key: ${newValue}`);

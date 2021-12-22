@@ -360,3 +360,6 @@ export const LOBBY_USER_UPDATED = 'conference.lobby.userUpdated';
  * A user left the lobby room.
  */
 export const LOBBY_USER_LEFT = 'conference.lobby.userLeft';
+
+export const USER_CUSTOMMEMBERID_CHANGED = 'conference.customMemberId';
+export const USER_CUSTOMUSERAVATAR_CHANGED = 'conference.customUserAvatar';

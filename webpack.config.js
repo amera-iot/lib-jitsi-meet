@@ -1,7 +1,7 @@
 const process = require('process');
 
 const config = require('./webpack-shared-config');
-
+config.node = { fs: 'empty' };
 module.exports = [
     Object.assign({}, config, {
         entry: {

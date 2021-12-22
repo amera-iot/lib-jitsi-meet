@@ -331,7 +331,30 @@ JitsiConferenceEventManager.prototype.setupChatRoomListeners = function() {
                 JitsiConferenceEvents.AUTH_STATUS_CHANGED, authEnabled,
                 authIdentity);
         });
+     chatRoom.addListener(XMPPEvents.PRESENCE_CUSTOMUSERAVATAR,
+        (jid, customUserAvatar) => {
+            const id = Strophe.getResourceFromJid(jid);
+            const participant = conference.getParticipantById(id);
 
+            if (!participant || participant._customUserAvatar === customUserAvatar) {
+                return;
+            }
+            participant._customUserAvatar = customUserAvatar;
+            conference.eventEmitter.emit(
+                JitsiConferenceEvents.USER_CUSTOMUSERAVATAR_CHANGED, id, customUserAvatar);
+        }); 
+    chatRoom.addListener(XMPPEvents.PRESENCE_CUSTOMMEMBERID,
+        (jid, customMemberId) => {
+            const id = Strophe.getResourceFromJid(jid);
+            const participant = conference.getParticipantById(id);
+
+            if (!participant || participant._customMemberId === customMemberId) {
+                return;
+            }
+            participant._customMemberId = customMemberId;
+            conference.eventEmitter.emit(
+                JitsiConferenceEvents.USER_CUSTOMMEMBERID_CHANGED, id, customMemberId);
+        }); 
     chatRoom.addListener(
         XMPPEvents.MESSAGE_RECEIVED,
 

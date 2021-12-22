@@ -81,8 +81,8 @@ module.exports = {
     },
     performance: {
         hints: minimize ? 'error' : false,
-        maxAssetSize: 750 * 1024,
-        maxEntrypointSize: 750 * 1024
+        maxAssetSize: 75000 * 1024,
+        maxEntrypointSize: 75000 * 1024
     },
     plugins: [
         analyzeBundle

@@ -1513,8 +1513,9 @@ JitsiConference.prototype.muteParticipant = function(id) {
  * @param fullJid the member full jid, if any
  * @param features the member botType, if any
  */
-JitsiConference.prototype.onMemberJoined = function(
-        jid, nick, role, isHidden, statsID, status, identity, botType, fullJid, features) {
+JitsiConference.prototype.onMemberJoined = function (
+    jid, nick, role, isHidden, statsID, status, identity, botType, fullJid, features, customMemberId, customUserAvatar
+) {
     const id = Strophe.getResourceFromJid(jid);
 
     if (id === 'focus' || this.myUserId() === id) {
@@ -1522,7 +1523,7 @@ JitsiConference.prototype.onMemberJoined = function(
     }
 
     const participant
-        = new JitsiParticipant(jid, this, nick, isHidden, statsID, status, identity);
+        = new JitsiParticipant(jid, this, nick, isHidden, statsID, status, identity, customMemberId, customUserAvatar);
 
     participant._role = role;
     participant._botType = botType;
@@ -3169,7 +3170,7 @@ JitsiConference.prototype._maybeStartOrStopP2P = function(userLeftEvent) {
 JitsiConference.prototype._shouldBeInP2PMode = function() {
     const peers = this.getParticipants();
     const peerCount = peers.length;
-    const hasBotPeer = peers.find(p => p._botType === 'poltergeist' || p._features.has(FEATURE_JIGASI)) !== undefined;
+    const hasBotPeer = peers.find(p => p._botType === 'poltergeist') !== undefined;
     const shouldBeInP2P = peerCount === 1 && !hasBotPeer;
 
     logger.debug(`P2P? peerCount: ${peerCount}, hasBotPeer: ${hasBotPeer} => ${shouldBeInP2P}`);
@@ -3451,17 +3452,24 @@ JitsiConference.prototype.isE2EESupported = function() {
 /**
  * Enables / disables End-to-End encryption.
  *
- * @param {boolean} enabled whether to enable E2EE or not.
- * @returns {void}
+ * @param {boolean} enabled whether to enable E2EE or not
+ * @param {Uint8Array|boolean} _key - The new key.
+ * @returns {Promise<boolean>}
  */
-JitsiConference.prototype.toggleE2EE = function(enabled) {
+JitsiConference.prototype.toggleE2EE = function(enabled, _key) {
+    console.debug(`this.isE2EESupported(): ${this.isE2EESupported()}`);
     if (!this.isE2EESupported()) {
         logger.warn('Cannot enable / disable E2EE: platform is not supported.');
 
-        return;
+        return Promise.resolve(false);
     }
+    const isEnabled = this._e2eEncryption.setEnabled(enabled, _key);
 
-    this._e2eEncryption.setEnabled(enabled);
+    isEnabled
+        .then(gotEnabled => console.debug(`ToggleE2EE: ${gotEnabled}`))
+        .catch(error => console.debug(`ToggleE2EE Error: ${error}`));
+
+    return isEnabled;
 };
 
 /**

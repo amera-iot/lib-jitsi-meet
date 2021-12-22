@@ -426,6 +426,8 @@ export default class ChatRoom extends Listenable {
         }
         let hasStatusUpdate = false;
         let hasVersionUpdate = false;
+        let hascustomMemberIdUpdate = false;
+        let hascustomUserAvatarUpdate = false;
         const xElement
             = pres.getElementsByTagNameNS(
                 'http://jabber.org/protocol/muc#user', 'x')[0];
@@ -493,46 +495,52 @@ export default class ChatRoom extends Listenable {
             const node = nodes[i];
 
             switch (node.tagName) {
-            case 'bot': {
-                const { attributes } = node;
+                case 'bot': {
+                    const { attributes } = node;
 
-                if (!attributes) {
+                    if (!attributes) {
+                        break;
+                    }
+                    const { type } = attributes;
+
+                    member.botType = type;
                     break;
                 }
-                const { type } = attributes;
-
-                member.botType = type;
-                break;
-            }
-            case 'nick':
-                member.nick = node.value;
-                break;
-            case 'userId':
-                member.id = node.value;
-                break;
-            case 'stats-id':
-                member.statsID = node.value;
-                break;
-            case 'identity':
-                member.identity = extractIdentityInformation(node);
-                break;
-            case 'features': {
-                member.features = this._extractFeatures(node);
-                break;
-            }
-            case 'stat': {
-                const { attributes } = node;
-
-                if (!attributes) {
+                case 'nick':
+                    member.nick = node.value;
+                    break;
+                case 'userId':
+                    member.id = node.value;
+                    break;
+                case 'stats-id':
+                    member.statsID = node.value;
+                    break;
+                case 'identity':
+                    member.identity = extractIdentityInformation(node);
+                    break;
+                case 'features': {
+                    member.features = this._extractFeatures(node);
                     break;
                 }
-                const { name } = attributes;
+                case 'customMemberId':
+                    member.customMemberId = node.value;
+                    break;
+                case 'customUserAvatar':
+                    member.customUserAvatar = node.value;
+                    break;
+                case 'stat': {
+                    const { attributes } = node;
 
-                if (name === 'version') {
-                    member.version = attributes.value;
+                    if (!attributes) {
+                        break;
+                    }
+                    const { name } = attributes;
+
+                    if (name === 'version') {
+                        member.version = attributes.value;
+                    }
+                    break;
                 }
-                break;
-            }
             }
         }
 
@@ -579,6 +587,8 @@ export default class ChatRoom extends Listenable {
             logger.log('entered', from, member);
             hasStatusUpdate = member.status !== undefined;
             hasVersionUpdate = member.version !== undefined;
+            hascustomMemberIdUpdate = member.hascustomMemberIdUpdate !== undefined;
+            hascustomUserAvatarUpdate = member.hascustomUserAvatarUpdate !== undefined;
             if (member.isFocus) {
                 this._initFocus(from, member.features);
             } else {
@@ -596,7 +606,9 @@ export default class ChatRoom extends Listenable {
                     member.identity,
                     member.botType,
                     member.jid,
-                    member.features);
+                    member.features,
+                    member.customMemberId,
+                    member.customUserAvatar);
 
                 // we are reporting the status with the join
                 // so we do not want a second event about status update
@@ -665,6 +677,14 @@ export default class ChatRoom extends Listenable {
             if (!isEqual(memberOfThis.features, member.features)) {
                 memberOfThis.features = member.features;
                 this.eventEmitter.emit(XMPPEvents.PARTICIPANT_FEATURES_CHANGED, from, member.features);
+            }
+            if (memberOfThis.customMemberId !== member.customMemberId) {
+                hascustomMemberIdUpdate = true;
+                memberOfThis.customMemberId= member.customMemberId;
+            }
+            if (memberOfThis.customUserAvatar !== member.customUserAvatar) {
+                hascustomUserAvatarUpdate = true;
+                memberOfThis.customUserAvatar= member.customUserAvatar;
             }
         }
 
@@ -755,7 +775,18 @@ export default class ChatRoom extends Listenable {
                 from,
                 member.status);
         }
-
+        if (hascustomMemberIdUpdate) {
+            this.eventEmitter.emit(
+                XMPPEvents.PRESENCE_CUSTOMMEMBERID,
+                from,
+                member.customMemberId);
+        }
+        if (hascustomUserAvatarUpdate) {
+            this.eventEmitter.emit(
+                XMPPEvents.PRESENCE_CUSTOMUSERAVATAR,
+                from,
+                member.customUserAvatar);
+        }
         if (hasVersionUpdate) {
             logger.info(`Received version for ${jid}: ${member.version}`);
         }

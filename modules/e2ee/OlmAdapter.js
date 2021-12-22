@@ -60,7 +60,7 @@ export class OlmAdapter extends Listenable {
         this._conf = conference;
         this._init = new Deferred();
         this._key = undefined;
-        this._keyIndex = -1;
+        this._keyIndex = 0;
         this._reqs = new Map();
 
         if (OlmAdapter.isSupported()) {
@@ -89,7 +89,7 @@ export class OlmAdapter extends Listenable {
      * by sending a key-info message.
      *
      * @param {Uint8Array|boolean} key - The new key.
-     * @returns {number}
+     * @returns {Promise<Number>}
      */
     async updateCurrentKey(key) {
         this._key = key;
@@ -102,12 +102,19 @@ export class OlmAdapter extends Listenable {
      * by sending a key-info message.
      *
      * @param {Uint8Array|boolean} key - The new key.
-     * @retrns {Promise<Number>}
+     * @param {boolean} distribute - whether or not to distribute the key
+     * @returns {Promise<Number>}
      */
-    async updateKey(key) {
+    async updateKey(key, distribute = true) {
         // Store it locally for new sessions.
         this._key = key;
-        this._keyIndex++;
+
+        // TODO: Uncomment if we decide to do multiple keys
+        // this._keyIndex++;
+
+        if (distribute === false) {
+            return this._keyIndex;
+        }
 
         // Broadcast it.
         const promises = [];

@@ -31,7 +31,7 @@ export default class JitsiParticipant {
      * @param {string} status - the initial status if any.
      * @param {object} identity - the xmpp identity
      */
-    constructor(jid, conference, displayName, hidden, statsID, status, identity) {
+    constructor(jid, conference, displayName, hidden, statsID, status, identity,customMemberId,customUserAvatar) {
         this._jid = jid;
         this._id = Strophe.getResourceFromJid(jid);
         this._conference = conference;
@@ -45,6 +45,8 @@ export default class JitsiParticipant {
         this._connectionStatus = ParticipantConnectionStatus.ACTIVE;
         this._properties = {};
         this._identity = identity;
+        this._customMemberId = customMemberId;
+        this._customUserAvatar = customUserAvatar;
         this._features = new Set();
     }
 

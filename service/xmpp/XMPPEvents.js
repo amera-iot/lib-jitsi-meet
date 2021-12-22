@@ -186,7 +186,8 @@ const XMPPEvents = {
 
     // xmpp is connected and obtained user media
     READY_TO_JOIN: 'xmpp.ready_to_join',
-
+    PRESENCE_CUSTOMUSERAVATAR: 'xmpp.presence_customUserAvatar',
+    PRESENCE_CUSTOMMEMBERID: 'xmpp.presence_customMemberId',
     /**
      * Indicates that recording state changed.
      */
