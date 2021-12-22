@@ -9,6 +9,12 @@
 export const AUDIO_INPUT_STATE_CHANGE = 'conference.audio_input_state_changed';
 
 /**
+ * Event indicates that the permission for unmuting audio has changed based on the number of audio senders in the call
+ * and the audio sender limit configured in Jicofo.
+ */
+export const AUDIO_UNMUTE_PERMISSIONS_CHANGED = 'conference.audio_unmute_permissions_changed';
+
+/**
  * Indicates that authentication status changed.
  */
 export const AUTH_STATUS_CHANGED = 'conference.auth_status_changed';
@@ -31,6 +37,11 @@ export const CONFERENCE_ERROR = 'conference.error';
 export const CONFERENCE_FAILED = 'conference.failed';
 
 /**
+ * Indicates that conference is in progress of joining.
+ */
+export const CONFERENCE_JOIN_IN_PROGRESS = 'conference.join_in_progress';
+
+/**
  * Indicates that conference has been joined. The event does NOT provide any
  * parameters to its listeners.
  */
@@ -40,6 +51,11 @@ export const CONFERENCE_JOINED = 'conference.joined';
  * Indicates that conference has been left.
  */
 export const CONFERENCE_LEFT = 'conference.left';
+
+/**
+ * Indicates that the conference unique identifier has been set.
+ */
+export const CONFERENCE_UNIQUE_ID_SET = 'conference.unique_id_set';
 
 /**
  * Indicates that the connection to the conference has been established
@@ -91,6 +107,11 @@ export const DTMF_SUPPORT_CHANGED = 'conference.dtmfSupportChanged';
  * channel.
  */
 export const ENDPOINT_MESSAGE_RECEIVED = 'conference.endpoint_message_received';
+
+/**
+ * Indicates that a message for the remote endpoint statistics has been received on the bridge channel.
+ */
+export const ENDPOINT_STATS_RECEIVED = 'conference.endpoint_stats_received';
 
 /**
  * NOTE This is lib-jitsi-meet internal event and can be removed at any time !
@@ -179,6 +200,12 @@ export const NO_AUDIO_INPUT = 'conference.no_audio_input';
  * Event indicates that the current microphone used by the conference is noisy.
  */
 export const NOISY_MIC = 'conference.noisy_mic';
+
+/**
+ * Indicates that a message from the local user or from the Prosody backend
+ * was received on the data channel.
+ */
+export const NON_PARTICIPANT_MESSAGE_RECEIVED = 'conference.non_participant_message_received';
 
 /**
  * New private text message was received.
@@ -312,6 +339,12 @@ export const TRACK_MUTE_CHANGED = 'conference.trackMuteChanged';
 export const TRACK_REMOVED = 'conference.trackRemoved';
 
 /**
+ * The source-add for unmuting of a media track was rejected by Jicofo.
+ *
+ */
+export const TRACK_UNMUTE_REJECTED = 'conference.trackUnmuteRejected';
+
+/**
  * Notifies for transcription status changes. The event provides the
  * following parameters to its listeners:
  *
@@ -342,6 +375,12 @@ export const USER_ROLE_CHANGED = 'conference.roleChanged';
 export const USER_STATUS_CHANGED = 'conference.statusChanged';
 
 /**
+ * Event indicates that the permission for unmuting video has changed based on the number of video senders in the call
+ * and the video sender limit configured in Jicofo.
+ */
+export const VIDEO_UNMUTE_PERMISSIONS_CHANGED = 'conference.video_unmute_permissions_changed';
+
+/**
  * Event indicates that the bot participant type changed.
  */
 export const BOT_TYPE_CHANGED = 'conference.bot_type_changed';
@@ -360,6 +399,67 @@ export const LOBBY_USER_UPDATED = 'conference.lobby.userUpdated';
  * A user left the lobby room.
  */
 export const LOBBY_USER_LEFT = 'conference.lobby.userLeft';
+
+/**
+ * The local participant was approved to be able to unmute.
+ * @param {options} event - {
+ *     {MediaType} mediaType
+ * }.
+ */
+export const AV_MODERATION_APPROVED = 'conference.av_moderation.approved';
+
+/**
+ * The local participant was blocked to be able to unmute.
+ * @param {options} event - {
+ *     {MediaType} mediaType
+ * }.
+ */
+export const AV_MODERATION_REJECTED = 'conference.av_moderation.rejected';
+
+/**
+ * AV Moderation was enabled/disabled. The actor is the participant that is currently in the meeting,
+ * or undefined if that participant has left the meeting.
+ *
+ * @param {options} event - {
+ *     {boolean} enabled,
+ *     {MediaType} mediaType,
+ *     {JitsiParticipant} actor
+ * }.
+ */
+export const AV_MODERATION_CHANGED = 'conference.av_moderation.changed';
+
+/**
+ * AV Moderation, report for user being approved to unmute.
+ * @param {options} event - {
+ *     {JitsiParticipant} participant,
+ *     {MediaType} mediaType
+ * }.
+ */
+export const AV_MODERATION_PARTICIPANT_APPROVED = 'conference.av_moderation.participant.approved';
+
+/**
+ * AV Moderation, report for user being blocked to unmute.
+ * @param {options} event - {
+ *     {JitsiParticipant} participant,
+ *     {MediaType} mediaType
+ * }.
+ */
+export const AV_MODERATION_PARTICIPANT_REJECTED = 'conference.av_moderation.participant.rejected';
+
+/**
+ * A new facial expression is added with its duration for a participant
+ */
+export const FACIAL_EXPRESSION_ADDED = 'conference.facial_expression.added';
+
+/**
+ * Event fired when a participant is requested to join a given (breakout) room.
+ */
+export const BREAKOUT_ROOMS_MOVE_TO_ROOM = 'conference.breakout-rooms.move-to-room';
+
+/**
+ * Event fired when the breakout rooms data was updated.
+ */
+export const BREAKOUT_ROOMS_UPDATED = 'conference.breakout-rooms.updated';
 
 export const USER_CUSTOMMEMBERID_CHANGED = 'conference.customMemberId';
 export const USER_CUSTOMUSERAVATAR_CHANGED = 'conference.customUserAvatar';
