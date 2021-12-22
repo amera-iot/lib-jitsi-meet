@@ -32,8 +32,7 @@
     "strophejs-plugin-disco": "0.0.2",
     "strophejs-plugin-stream-management": "github:jitsi/strophejs-plugin-stream-management#001cf02bef2357234e1ac5d163611b4d60bf2b6a",
     "uuid": "8.1.0",
-    "webrtc-adapter": "8.0.0",
-    "olm": "https://packages.matrix.org/npm/olm/olm-3.2.1.tgz"
+    "webrtc-adapter": "8.0.0"
   },
   "devDependencies": {
     "@babel/core": "7.16.0",

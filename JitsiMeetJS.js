@@ -37,17 +37,19 @@ import * as ConnectionQualityEvents
     from './service/connectivity/ConnectionQualityEvents';
 import * as E2ePingEvents from './service/e2eping/E2ePingEvents';
 import { createGetUserMediaEvent } from './service/statistics/AnalyticsEvents';
-import  'olm';
-// window.APP = {
-//   Olm : window.Olm
+
+// # TODO: Freddy, verify if this is even needed anymore
+// import  'olm';
+// // window.APP = {
+// //   Olm : window.Olm
+// // }
+// console.log(window.Olm);
+// if (window.Olm) {
+//   window.Olm.init().catch(e => {
+//       console.error('Failed to initialize Olm, E2EE will be disabled', e);
+//       delete window.Olm;
+//   });
 // }
-console.log(window.Olm);
-if (window.Olm) {
-  window.Olm.init().catch(e => {
-      console.error('Failed to initialize Olm, E2EE will be disabled', e);
-      delete window.Olm;
-  });
-}
 const logger = Logger.getLogger(__filename);
 
 /**
