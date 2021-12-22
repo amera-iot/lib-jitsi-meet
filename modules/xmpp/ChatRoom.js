@@ -521,52 +521,52 @@ export default class ChatRoom extends Listenable {
             const node = nodes[i];
 
             switch (node.tagName) {
-                case 'bot': {
-                    const { attributes } = node;
+            case 'bot': {
+                const { attributes } = node;
 
-                    if (!attributes) {
-                        break;
-                    }
-                    const { type } = attributes;
-
-                    member.botType = type;
+                if (!attributes) {
                     break;
                 }
-                case 'nick':
-                    member.nick = node.value;
-                    break;
-                case 'userId':
-                    member.id = node.value;
-                    break;
-                case 'stats-id':
-                    member.statsID = node.value;
-                    break;
-                case 'identity':
-                    member.identity = extractIdentityInformation(node);
-                    break;
-                case 'features': {
-                    member.features = this._extractFeatures(node);
+                const { type } = attributes;
+
+                member.botType = type;
+                break;
+            }
+            case 'nick':
+                member.nick = node.value;
+                break;
+            case 'userId':
+                member.id = node.value;
+                break;
+            case 'stats-id':
+                member.statsID = node.value;
+                break;
+            case 'identity':
+                member.identity = extractIdentityInformation(node);
+                break;
+            case 'features': {
+                member.features = this._extractFeatures(node);
+                break;
+            }
+            case 'customMemberId':
+                member.customMemberId = node.value;
+                break;
+            case 'customUserAvatar':
+                member.customUserAvatar = node.value;
+                break;
+            case 'stat': {
+                const { attributes } = node;
+
+                if (!attributes) {
                     break;
                 }
-                case 'customMemberId':
-                    member.customMemberId = node.value;
-                    break;
-                case 'customUserAvatar':
-                    member.customUserAvatar = node.value;
-                    break;
-                case 'stat': {
-                    const { attributes } = node;
+                const { name } = attributes;
 
-                    if (!attributes) {
-                        break;
-                    }
-                    const { name } = attributes;
-
-                    if (name === 'version') {
-                        member.version = attributes.value;
-                    }
-                    break;
+                if (name === 'version') {
+                    member.version = attributes.value;
                 }
+                break;
+            }
             }
         }
 

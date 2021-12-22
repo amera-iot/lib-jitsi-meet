@@ -126,13 +126,12 @@ export class OlmAdapter extends Listenable {
     async updateKey(key, distribute = true) {
         // Store it locally for new sessions.
         this._key = key;
+        this._keyIndex++;
 
-        // TODO: Uncomment if we decide to do multiple keys
-        // this._keyIndex++;
-
-        if (distribute === false) {
-            return this._keyIndex;
-        }
+        // TODO: This area is to prevent ratcheting
+        // if (distribute === false) {
+        //     return this._keyIndex;
+        // }
 
         // Broadcast it.
         const promises = [];

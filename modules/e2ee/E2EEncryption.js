@@ -115,7 +115,7 @@ export class E2EEncryption {
      * Enables / disables End-To-End encryption.
      *
      * @param {boolean} enabled - whether E2EE should be enabled or not.
-     * @returns {Promise<boolean>}
+     * @returns {void}
      */
     async setEnabled(enabled) {
         await this._keyHandler.setEnabled(enabled);

@@ -3917,27 +3917,42 @@ JitsiConference.prototype.isE2EESupported = function() {
     return E2EEncryption.isSupported(this.options.config);
 };
 
+// /**
+//  * Enables / disables End-to-End encryption.
+//  *
+//  * @param {boolean} enabled whether to enable E2EE or not
+//  * @param {Uint8Array|boolean} _key - The new key.
+//  * @returns {Promise<boolean>}
+//  */
+// JitsiConference.prototype.toggleE2EE = function(enabled, _key) {
+//     console.debug(`this.isE2EESupported(): ${this.isE2EESupported()}`);
+//     if (!this.isE2EESupported()) {
+//         logger.warn('Cannot enable / disable E2EE: platform is not supported.');
+
+//         return Promise.resolve(false);
+//     }
+//     const isEnabled = this._e2eEncryption.setEnabled(enabled, _key);
+
+//     isEnabled
+//         .then(gotEnabled => console.debug(`ToggleE2EE: ${gotEnabled}`))
+//         .catch(error => console.debug(`ToggleE2EE Error: ${error}`));
+
+//     return isEnabled;
+// };
 /**
  * Enables / disables End-to-End encryption.
  *
- * @param {boolean} enabled whether to enable E2EE or not
- * @param {Uint8Array|boolean} _key - The new key.
- * @returns {Promise<boolean>}
+ * @param {boolean} enabled whether to enable E2EE or not.
+ * @returns {void}
  */
-JitsiConference.prototype.toggleE2EE = function(enabled, _key) {
-    console.debug(`this.isE2EESupported(): ${this.isE2EESupported()}`);
+JitsiConference.prototype.toggleE2EE = function(enabled) {
     if (!this.isE2EESupported()) {
         logger.warn('Cannot enable / disable E2EE: platform is not supported.');
 
-        return Promise.resolve(false);
+        return;
     }
-    const isEnabled = this._e2eEncryption.setEnabled(enabled, _key);
 
-    isEnabled
-        .then(gotEnabled => console.debug(`ToggleE2EE: ${gotEnabled}`))
-        .catch(error => console.debug(`ToggleE2EE Error: ${error}`));
-
-    return isEnabled;
+    this._e2eEncryption.setEnabled(enabled);
 };
 
 /**
